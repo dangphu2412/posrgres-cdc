@@ -4,6 +4,7 @@ import { PostController } from './controller';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PostEntity } from './entity';
+import { CdcListenerService } from './cdc-listener';
 
 @Module({
   imports: [
@@ -31,12 +32,13 @@ import { PostEntity } from './entity';
     TypeOrmModule.forFeature([PostEntity]),
   ],
   controllers: [PostController],
+  providers: [CdcListenerService]
 })
 class AppModule {}
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  await app.listen(process.env.PORT ?? 3000);
+  await app.listen(process.env.PORT ?? 3001);
   Logger.log(`${await app.getUrl()}`);
 }
 bootstrap();

@@ -4,7 +4,8 @@ import { PostController } from './controller';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PostEntity } from './entity';
-import { CdcListenerService } from './cdc-listener';
+import { CacheModule } from '@nestjs/cache-manager';
+import { createKeyv } from '@keyv/redis';
 
 @Module({
   imports: [
@@ -30,9 +31,17 @@ import { CdcListenerService } from './cdc-listener';
       }),
     }),
     TypeOrmModule.forFeature([PostEntity]),
+    CacheModule.registerAsync({
+      useFactory: async () => {
+        return {
+          stores: [
+            createKeyv('redis://localhost:6379'),
+          ],
+        };
+      },
+    }),
   ],
   controllers: [PostController],
-  providers: [CdcListenerService]
 })
 class AppModule {}
 

@@ -73,10 +73,28 @@ services:
       start_period: 10s # Give Kafka some time to start up before checking
 
 
+  # --- Add Redis Service ---
+  redis-cache:
+    image: redis:7-alpine # Using Redis 7 on Alpine base
+    container_name: redis-cache
+    ports:
+      - "6379:6379" # Expose default Redis port
+    command: redis-server --appendonly yes # Enable AOF persistence (optional but often good)
+    volumes:
+      - redis_data:/data # Persist data in /data directory inside container
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+
 # Define named volumes for data persistence
 volumes:
   postgres_data:
   kafka_kraft_data:
+  redis_data: # Add volume for Redis persistence
 
 # Optional: Define a custom network
 # networks:
