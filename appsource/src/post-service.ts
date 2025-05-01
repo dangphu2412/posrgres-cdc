@@ -3,7 +3,8 @@ import {
   Controller,
   Delete,
   Get,
-  Inject, Logger,
+  Inject,
+  Logger,
   Param,
   ParseIntPipe,
   Post,
@@ -21,7 +22,6 @@ import {
 } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
-import { merge } from 'lodash';
 
 @Entity('posts') // Specifies the table name as 'posts'
 export class PostEntity {
@@ -73,15 +73,15 @@ export class PostController {
 
   private async getCachedPosts(page: number, size: number) {
     const key = `posts:${page}:${size}`;
-    const postIds = await this.cache.get<string[]>(key);
-    Logger.log(`Getting cached posts ${postIds?.toString()}`);
+    const postIdKeys = await this.cache.get<string[]>(key);
+    Logger.log(`Getting cached posts ${postIdKeys?.toString()}`);
 
-    if (!postIds) {
+    if (!postIdKeys) {
       Logger.log(`No cached posts found.`);
       return null;
     }
 
-    const cached = await this.cache.mget<PostEntity>(postIds);
+    const cached = await this.cache.mget<PostEntity>(postIdKeys);
     const cacheMissItems = cached.filter((i) => i === null);
 
     // No cached items found
@@ -91,11 +91,15 @@ export class PostController {
     }
 
     // Find latest cache from missed
-    const diff = postIds.filter((postId) => {
-      return !cached.some((i) => i?.id === postId);
-    });
+    const diff = postIdKeys
+      .filter((postId) => {
+        return !cached.some((i) => `post:${i?.id}` === postId);
+      })
+      .map((i) => i.slice('post:'.length));
 
-    Logger.log(`Partial cached hit. Find latest cache from missed: ${diff.toString()}`);
+    Logger.log(
+      `Partial cached hit. Find latest cache from missed: ${diff.toString()}`,
+    );
 
     const missedItems = await this.postsRepository.find({
       where: {
@@ -103,7 +107,7 @@ export class PostController {
       },
     });
 
-    const merged = merge(cached, missedItems);
+    const merged = cached.filter((i) => i !== null).concat(missedItems);
 
     await this.saveCachePosts(page, size, merged);
 
@@ -117,16 +121,16 @@ export class PostController {
   ) {
     Logger.log(`Save cache posts ${page}`);
     const key = `posts:${page}:${size}`;
-    const postIds = posts.map((i) => i.id);
+    const postIdKeys = posts.map((i) => `post:${i.id}`);
 
     await Promise.all([
-      this.cache.set(key, postIds, 10000),
+      this.cache.set(key, postIdKeys, 10000),
       this.cache.mset(
         posts.map((post) => {
           return {
             key: `post:${post.id}`,
             value: post,
-            ttl: 10000
+            ttl: 10000,
           };
         }),
       ),
