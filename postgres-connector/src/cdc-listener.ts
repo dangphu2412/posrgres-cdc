@@ -12,6 +12,16 @@ import {
   PgoutputPlugin,
 } from 'pg-logical-replication';
 import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
+import { PostEntity } from './entity';
+
+type Log = {
+  tag: string;
+  relation: {
+    tag: string;
+    relationOid: number;
+  };
+  new: PostEntity;
+};
 
 @Injectable()
 export class CdcListenerService implements OnModuleInit, OnApplicationShutdown {
@@ -25,9 +35,9 @@ export class CdcListenerService implements OnModuleInit, OnApplicationShutdown {
     private readonly cache: Cache,
   ) {}
 
-  async onModuleInit() {
+  onModuleInit() {
     this.logger.log('Initializing CDC Listener Service...');
-    await this.startListening();
+    this.startListening();
   }
 
   async onApplicationShutdown(signal?: string) {
@@ -45,7 +55,7 @@ export class CdcListenerService implements OnModuleInit, OnApplicationShutdown {
     }
   }
 
-  private async startListening() {
+  private startListening() {
     this.replicationService = new LogicalReplicationService(
       {
         host: this.configService.get<string>('PG_REPLICATION_HOST'),
@@ -91,18 +101,10 @@ export class CdcListenerService implements OnModuleInit, OnApplicationShutdown {
   }
 
   private setupEventHandlers() {
-    this.replicationService.on('data', async (lsn: string, log: any) => {
+    this.replicationService.on('data', async (lsn: string, log: Log) => {
       // Log the raw data for inspection
       this.logger.debug(`[LSN: ${lsn}] Received Data - Tag: ${log.tag}`);
 
-      type Log = {
-        tag: string;
-        relation: {
-          tag: string;
-          relationOid: number;
-        };
-        new: object;
-      };
       // Provide more detailed logging for actual changes
       if (['insert', 'update', 'delete'].includes(log.tag)) {
         await this.cache.set(`post:${log.new.id}`, log.new);

@@ -111,7 +111,7 @@ export class PostController {
 
     await this.saveCachePosts(page, size, merged);
 
-    return merged as PostEntity[];
+    return merged;
   }
 
   private async saveCachePosts(

@@ -32,7 +32,7 @@ import { createKeyv } from '@keyv/redis';
     }),
     TypeOrmModule.forFeature([PostEntity]),
     CacheModule.registerAsync({
-      useFactory: async () => {
+      useFactory: () => {
         return {
           stores: [createKeyv('redis://localhost:6379')],
         };
