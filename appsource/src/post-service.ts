@@ -21,7 +21,7 @@ import {
 } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
-import merge from 'lodash/merge';
+import { merge } from 'lodash';
 
 @Entity('posts') // Specifies the table name as 'posts'
 export class PostEntity {
@@ -124,7 +124,7 @@ export class PostController {
       this.cache.mset(
         posts.map((post) => {
           return {
-            key: post.id,
+            key: `post:${post.id}`,
             value: post,
             ttl: 10000
           };

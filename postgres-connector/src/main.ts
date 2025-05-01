@@ -1,10 +1,11 @@
 import { NestFactory } from '@nestjs/core';
 import { Logger, Module } from '@nestjs/common';
-import { PostController } from './controller';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PostEntity } from './entity';
 import { CdcListenerService } from './cdc-listener';
+import { CacheModule } from '@nestjs/cache-manager';
+import { createKeyv } from '@keyv/redis';
 
 @Module({
   imports: [
@@ -25,13 +26,19 @@ import { CdcListenerService } from './cdc-listener';
         entities: [PostEntity], // Add your entities here
         // synchronize: true -> DEVELOPMENT ONLY! Automatically creates/updates schema.
         // WARNING: NEVER use synchronize: true in PRODUCTION. Use migrations instead.
-        synchronize: true, // For local dev, set to false in production
+        synchronize: false, // Just listen for changes
         logging: true, // Set to true to see SQL queries (can be verbose)
       }),
     }),
     TypeOrmModule.forFeature([PostEntity]),
+    CacheModule.registerAsync({
+      useFactory: async () => {
+        return {
+          stores: [createKeyv('redis://localhost:6379')],
+        };
+      },
+    }),
   ],
-  controllers: [PostController],
   providers: [CdcListenerService],
 })
 class AppModule {}

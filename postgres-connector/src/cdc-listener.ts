@@ -3,13 +3,14 @@ import {
   Injectable,
   OnModuleInit,
   OnApplicationShutdown,
-  Logger,
+  Logger, Inject,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {
   LogicalReplicationService,
   PgoutputPlugin,
 } from 'pg-logical-replication';
+import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 
 @Injectable()
 export class CdcListenerService implements OnModuleInit, OnApplicationShutdown {
@@ -17,7 +18,10 @@ export class CdcListenerService implements OnModuleInit, OnApplicationShutdown {
   private replicationService: LogicalReplicationService;
   private isRunning = false;
 
-  constructor(private configService: ConfigService) {}
+  constructor(
+    private configService: ConfigService,
+    @Inject(CACHE_MANAGER)
+    private readonly cache: Cache) {}
 
   async onModuleInit() {
     this.logger.log('Initializing CDC Listener Service...');
@@ -85,31 +89,39 @@ export class CdcListenerService implements OnModuleInit, OnApplicationShutdown {
   }
 
   private setupEventHandlers() {
-    this.replicationService.on('data', (lsn: string, log: any) => {
+    this.replicationService.on('data', async (lsn: string, log: any) => {
       // Log the raw data for inspection
       this.logger.debug(`[LSN: ${lsn}] Received Data - Tag: ${log.tag}`);
 
+      type Log = {
+        tag: string,
+        relation: {
+          tag: string,
+          relationOid: number,
+        },
+        new: object,
+      }
       // Provide more detailed logging for actual changes
       if (['insert', 'update', 'delete'].includes(log.tag)) {
         console.log(log);
-        const details = {
-          operation: log.tag,
-          schema: log.relation?.schema,
-          table: log.relation?.name,
-          newData: log.new_tuple?.map((t) => ({
-            name: t.name,
-            type: t.type,
-            value: t.value,
-          })),
-          oldData: log.old_tuple?.map((t) => ({
-            name: t.name,
-            type: t.type,
-            value: t.value,
-          })), // If available
-        };
-        this.logger.log(
-          `[LSN: ${lsn}] Change Detected: ${JSON.stringify(details)}`,
-        );
+        // const details = {
+        //   operation: log.tag,
+        //   schema: log.relation?.schema,
+        //   table: log.relation?.name,
+        //   newData: log.new_tuple?.map((t) => ({
+        //     name: t.name,
+        //     type: t.type,
+        //     value: t.value,
+        //   })),
+        //   oldData: log.old_tuple?.map((t) => ({
+        //     name: t.name,
+        //     type: t.type,
+        //     value: t.value,
+        //   })), // If available
+        // };
+
+        await this.cache.set(`post:${log.new.id}`, log.new);
+        this.logger.log(`Update cached ${log.new.id}`)
       } else if (log.tag === 'commit') {
         this.logger.verbose(`[LSN: ${lsn}] Transaction Commit.`);
       }
