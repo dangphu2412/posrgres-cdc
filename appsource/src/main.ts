@@ -1,9 +1,8 @@
 import { NestFactory } from '@nestjs/core';
 import { Logger, Module } from '@nestjs/common';
-import { PostController } from './controller';
+import { PostController, PostEntity } from './post-service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { PostEntity } from './entity';
 import { CacheModule } from '@nestjs/cache-manager';
 import { createKeyv } from '@keyv/redis';
 
@@ -34,9 +33,7 @@ import { createKeyv } from '@keyv/redis';
     CacheModule.registerAsync({
       useFactory: async () => {
         return {
-          stores: [
-            createKeyv('redis://localhost:6379'),
-          ],
+          stores: [createKeyv('redis://localhost:6379')],
         };
       },
     }),

@@ -1,7 +1,15 @@
 // src/cdc-listener/cdc-listener.service.ts
-import { Injectable, OnModuleInit, OnApplicationShutdown, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  OnModuleInit,
+  OnApplicationShutdown,
+  Logger,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { LogicalReplicationService, PgoutputPlugin } from 'pg-logical-replication';
+import {
+  LogicalReplicationService,
+  PgoutputPlugin,
+} from 'pg-logical-replication';
 
 @Injectable()
 export class CdcListenerService implements OnModuleInit, OnApplicationShutdown {
@@ -17,7 +25,9 @@ export class CdcListenerService implements OnModuleInit, OnApplicationShutdown {
   }
 
   async onApplicationShutdown(signal?: string) {
-    this.logger.log(`Received ${signal || 'shutdown signal'}. Stopping CDC Listener...`);
+    this.logger.log(
+      `Received ${signal || 'shutdown signal'}. Stopping CDC Listener...`,
+    );
     this.isRunning = false;
     if (this.replicationService) {
       try {
@@ -30,36 +40,48 @@ export class CdcListenerService implements OnModuleInit, OnApplicationShutdown {
   }
 
   private async startListening() {
-    this.replicationService = new LogicalReplicationService({
-      host: this.configService.get<string>('PG_REPLICATION_HOST'),
-      port: this.configService.get<number>('PG_REPLICATION_PORT'),
-      user: this.configService.get<string>('PG_REPLICATION_USER'),
-      password: this.configService.get<string>('PG_REPLICATION_PASSWORD'),
-      database: this.configService.get<string>('PG_REPLICATION_DATABASE'),
-      replication: 'database' as const, // Crucial for replication protocol
-      // Add SSL options if needed: ssl: { rejectUnauthorized: false } or provide certs
-    }, {
-      acknowledge: { auto: true, timeoutSeconds: 10 } // Let the library handle ACKs via heartbeats mostly
-    });
+    this.replicationService = new LogicalReplicationService(
+      {
+        host: this.configService.get<string>('PG_REPLICATION_HOST'),
+        port: this.configService.get<number>('PG_REPLICATION_PORT'),
+        user: this.configService.get<string>('PG_REPLICATION_USER'),
+        password: this.configService.get<string>('PG_REPLICATION_PASSWORD'),
+        database: this.configService.get<string>('PG_REPLICATION_DATABASE'),
+        replication: 'database' as const, // Crucial for replication protocol
+        // Add SSL options if needed: ssl: { rejectUnauthorized: false } or provide certs
+      },
+      {
+        acknowledge: { auto: true, timeoutSeconds: 10 }, // Let the library handle ACKs via heartbeats mostly
+      },
+    );
     this.setupEventHandlers();
 
-    const plugin = new PgoutputPlugin({ protoVersion: 1, publicationNames: [this.configService.getOrThrow<string>('PG_PUBLICATION_NAME')] });
+    const plugin = new PgoutputPlugin({
+      protoVersion: 1,
+      publicationNames: [
+        this.configService.getOrThrow<string>('PG_PUBLICATION_NAME'),
+      ],
+    });
     const slotName = this.configService.getOrThrow<string>('PG_SLOT_NAME');
 
-      // **IMPORTANT: Slot Management**
-      // Production apps need robust logic to check if the slot exists and create it
-      // securely if needed, handling potential errors (e.g., race conditions, permissions).
-      // This example assumes the slot exists. If not, subscribe will likely fail.
-      // You might need to create it manually first using SQL:
-      // SELECT pg_create_logical_replication_slot('your_slot_name', 'pgoutput');
+    // **IMPORTANT: Slot Management**
+    // Production apps need robust logic to check if the slot exists and create it
+    // securely if needed, handling potential errors (e.g., race conditions, permissions).
+    // This example assumes the slot exists. If not, subscribe will likely fail.
+    // You might need to create it manually first using SQL:
+    // SELECT pg_create_logical_replication_slot('your_slot_name', 'pgoutput');
 
-      this.replicationService.subscribe(plugin, slotName).then(() => {
-        this.logger.log(`Successfully subscribed to slot "${slotName}". Listening for changes...`);
-      }).catch((err) => {
-        this.logger.error(`Failed to subscribe to slot "${slotName}":`, err);
+    this.replicationService
+      .subscribe(plugin, slotName)
+      .then(() => {
+        this.logger.log(
+          `Successfully subscribed to slot "${slotName}". Listening for changes...`,
+        );
       })
-      this.isRunning = true;
-
+      .catch((err) => {
+        this.logger.error(`Failed to subscribe to slot "${slotName}":`, err);
+      });
+    this.isRunning = true;
   }
 
   private setupEventHandlers() {
@@ -69,15 +91,25 @@ export class CdcListenerService implements OnModuleInit, OnApplicationShutdown {
 
       // Provide more detailed logging for actual changes
       if (['insert', 'update', 'delete'].includes(log.tag)) {
-        console.log(log)
+        console.log(log);
         const details = {
           operation: log.tag,
           schema: log.relation?.schema,
           table: log.relation?.name,
-          newData: log.new_tuple?.map(t => ({ name: t.name, type: t.type, value: t.value })),
-          oldData: log.old_tuple?.map(t => ({ name: t.name, type: t.type, value: t.value })), // If available
+          newData: log.new_tuple?.map((t) => ({
+            name: t.name,
+            type: t.type,
+            value: t.value,
+          })),
+          oldData: log.old_tuple?.map((t) => ({
+            name: t.name,
+            type: t.type,
+            value: t.value,
+          })), // If available
         };
-        this.logger.log(`[LSN: ${lsn}] Change Detected: ${JSON.stringify(details)}`);
+        this.logger.log(
+          `[LSN: ${lsn}] Change Detected: ${JSON.stringify(details)}`,
+        );
       } else if (log.tag === 'commit') {
         this.logger.verbose(`[LSN: ${lsn}] Transaction Commit.`);
       }
@@ -91,14 +123,23 @@ export class CdcListenerService implements OnModuleInit, OnApplicationShutdown {
       // Attempt reconnection after a delay? Needs robust logic.
       // For simplicity, we stop here in the example upon error.
       // Consider restarting the NestJS app via orchestrator (k8s, pm2) on fatal errors.
-      this.replicationService.stop().catch(stopErr => this.logger.error('Error stopping after error:', stopErr));
+      this.replicationService
+        .stop()
+        .catch((stopErr) =>
+          this.logger.error('Error stopping after error:', stopErr),
+        );
     });
 
-    this.replicationService.on('heartbeat', (lsn: string, timestamp: number, shouldRespond: boolean) => {
-      this.logger.verbose(`Heartbeat received (LSN: ${lsn}). Respond: ${shouldRespond}`);
-      // Acknowledge is handled automatically by the service config,
-      // but you could manually acknowledge here if needed based on shouldRespond.
-      // if (shouldRespond) { this.replicationService.acknowledge(lsn); }
-    });
+    this.replicationService.on(
+      'heartbeat',
+      (lsn: string, timestamp: number, shouldRespond: boolean) => {
+        this.logger.verbose(
+          `Heartbeat received (LSN: ${lsn}). Respond: ${shouldRespond}`,
+        );
+        // Acknowledge is handled automatically by the service config,
+        // but you could manually acknowledge here if needed based on shouldRespond.
+        // if (shouldRespond) { this.replicationService.acknowledge(lsn); }
+      },
+    );
   }
 }

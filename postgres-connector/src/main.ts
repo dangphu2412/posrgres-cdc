@@ -32,7 +32,7 @@ import { CdcListenerService } from './cdc-listener';
     TypeOrmModule.forFeature([PostEntity]),
   ],
   controllers: [PostController],
-  providers: [CdcListenerService]
+  providers: [CdcListenerService],
 })
 class AppModule {}
 
