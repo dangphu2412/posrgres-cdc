@@ -24,10 +24,12 @@ type Query {
 }
 
 type Tote {
+  bannerURL: String!
   createdAt: DateTime!
   description: String
   id: ID!
   name: String!
+  price: Float!
   updatedAt: DateTime!
 }
 

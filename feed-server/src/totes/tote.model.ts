@@ -12,6 +12,12 @@ export class Tote {
   @Field({ nullable: true })
   description?: string;
 
+  @Field()
+  price?: number;
+
+  @Field()
+  bannerURL: string;
+
   @Field(() => GraphQLDateTime)
   createdAt: Date;
 

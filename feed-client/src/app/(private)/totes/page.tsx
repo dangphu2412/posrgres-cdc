@@ -12,6 +12,7 @@ import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/c
 import {SidebarProvider, SidebarTrigger} from "@/components/ui/sidebar"
 import {toast} from "sonner"
 import {ToteFilters} from "@/features/totes/tote-filters";
+import {useGetTotesListingQuery} from "@/shared/graphql-client/api/graphql";
 
 // Product interface
 interface Product {
@@ -40,6 +41,13 @@ export default function TotesPage() {
 
     // State for cart items
     const [cartItems, setCartItems] = useState<CartItem[]>([])
+
+    const { data } = useGetTotesListingQuery({
+        variables: {
+            page: 1,
+            size: 10,
+        }
+    });
 
     // State for products with initial data
     const [products, setProducts] = useState<Product[]>([
