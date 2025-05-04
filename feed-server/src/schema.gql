@@ -1,0 +1,38 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+input CreateToteInput {
+  description: String
+  name: String!
+}
+
+"""
+A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `date-time` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar.
+"""
+scalar DateTime
+
+type Mutation {
+  createTote(createToteInput: CreateToteInput!): ID!
+  removeTote(id: Int!): Tote!
+  updateTote(updateToteInput: UpdateToteInput!): Tote!
+}
+
+type Query {
+  tote(id: String!): Tote!
+  totes(page: Float!, size: Float!): [Tote!]!
+}
+
+type Tote {
+  createdAt: DateTime!
+  description: String
+  id: ID!
+  name: String!
+  updatedAt: DateTime!
+}
+
+input UpdateToteInput {
+  description: String
+  id: Int!
+  name: String
+}
