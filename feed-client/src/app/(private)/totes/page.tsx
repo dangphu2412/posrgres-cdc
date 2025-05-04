@@ -1,17 +1,16 @@
 "use client"
 
-import { Filter, Search, SlidersHorizontal } from "lucide-react"
+import {Filter, Search, SlidersHorizontal} from "lucide-react"
 import Image from "next/image"
-import { useCallback, useEffect, useState } from "react"
+import {useCallback, useEffect, useState} from "react"
 
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
-import { toast } from "sonner"
-import {CartSidebar} from "@/features/shared/layout/cart-sidebar";
+import {Badge} from "@/components/ui/badge"
+import {Button} from "@/components/ui/button"
+import {Card, CardContent, CardHeader} from "@/components/ui/card"
+import {Input} from "@/components/ui/input"
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select"
+import {SidebarProvider, SidebarTrigger} from "@/components/ui/sidebar"
+import {toast} from "sonner"
 import {ToteFilters} from "@/features/totes/tote-filters";
 
 // Product interface
@@ -668,9 +667,6 @@ export default function TotesPage() {
                         </div>
                     </div>
                 </main>
-
-                {/* Cart Sidebar */}
-                <CartSidebar cartItems={cartItems} updateQuantity={updateQuantity} />
             </div>
         </SidebarProvider>
     )

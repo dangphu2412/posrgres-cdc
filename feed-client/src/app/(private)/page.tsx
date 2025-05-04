@@ -6,11 +6,8 @@ import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar"
 import {Button} from "@/components/ui/button"
 import {Card, CardContent, CardHeader} from "@/components/ui/card"
 import {Input} from "@/components/ui/input"
-import {Separator} from "@/components/ui/separator"
 import {Toaster} from "@/components/ui/sonner"
 import {toast} from "sonner"
-import {Sidebar} from "@/features/shared/layout/Sidebar";
-import {CartSidebar} from "@/features/shared/layout/cart-sidebar";
 
 interface CartItem {
     id: string
@@ -227,9 +224,6 @@ export default function HomePage() {
                 ))}
             </div>
         </main>
-
-        {/* Cart Sidebar */}
-        <CartSidebar cartItems={cartItems} updateQuantity={updateQuantity}/>
     </>
   );
 }
