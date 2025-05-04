@@ -4,21 +4,34 @@ import { gql } from '@apollo/client';
 import * as Apollo from '@apollo/client';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
-export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
-export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
-export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
-export type MakeEmpty<T extends { [key: string]: unknown }, K extends keyof T> = { [_ in K]?: never };
-export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
+export type Exact<T extends { [key: string]: unknown }> = {
+  [K in keyof T]: T[K];
+};
+export type MakeOptional<T, K extends keyof T> = Omit<T, K> & {
+  [SubKey in K]?: Maybe<T[SubKey]>;
+};
+export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & {
+  [SubKey in K]: Maybe<T[SubKey]>;
+};
+export type MakeEmpty<
+  T extends { [key: string]: unknown },
+  K extends keyof T,
+> = { [_ in K]?: never };
+export type Incremental<T> =
+  | T
+  | {
+      [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never;
+    };
 const defaultOptions = {} as const;
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
-  ID: { input: string; output: string; }
-  String: { input: string; output: string; }
-  Boolean: { input: boolean; output: boolean; }
-  Int: { input: number; output: number; }
-  Float: { input: number; output: number; }
+  ID: { input: string; output: string };
+  String: { input: string; output: string };
+  Boolean: { input: boolean; output: boolean };
+  Int: { input: number; output: number };
+  Float: { input: number; output: number };
   /** A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `date-time` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar. */
-  DateTime: { input: any; output: any; }
+  DateTime: { input: any; output: any };
 };
 
 export type CreateToteInput = {
@@ -33,16 +46,13 @@ export type Mutation = {
   updateTote: Tote;
 };
 
-
 export type MutationCreateToteArgs = {
   createToteInput: CreateToteInput;
 };
 
-
 export type MutationRemoveToteArgs = {
   id: Scalars['Int']['input'];
 };
-
 
 export type MutationUpdateToteArgs = {
   updateToteInput: UpdateToteInput;
@@ -54,11 +64,9 @@ export type Query = {
   totes: Array<Tote>;
 };
 
-
 export type QueryToteArgs = {
   id: Scalars['String']['input'];
 };
-
 
 export type QueryTotesArgs = {
   page: Scalars['Float']['input'];
@@ -87,19 +95,19 @@ export type GetTotesListingQueryVariables = Exact<{
   size: Scalars['Float']['input'];
 }>;
 
-
-export type GetTotesListingQuery = { __typename?: 'Query', totes: Array<{ __typename?: 'Tote', id: string, name: string }> };
-
-
+export type GetTotesListingQuery = {
+  __typename?: 'Query';
+  totes: Array<{ __typename?: 'Tote'; id: string; name: string }>;
+};
 
 export const GetTotesListingDocument = gql`
-    query GetTotesListing($page: Float!, $size: Float!) {
-  totes(page: $page, size: $size) {
-    id
-    name
+  query GetTotesListing($page: Float!, $size: Float!) {
+    totes(page: $page, size: $size) {
+      id
+      name
+    }
   }
-}
-    `;
+`;
 
 /**
  * __useGetTotesListingQuery__
@@ -118,19 +126,61 @@ export const GetTotesListingDocument = gql`
  *   },
  * });
  */
-export function useGetTotesListingQuery(baseOptions: Apollo.QueryHookOptions<GetTotesListingQuery, GetTotesListingQueryVariables> & ({ variables: GetTotesListingQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetTotesListingQuery, GetTotesListingQueryVariables>(GetTotesListingDocument, options);
-      }
-export function useGetTotesListingLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetTotesListingQuery, GetTotesListingQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetTotesListingQuery, GetTotesListingQueryVariables>(GetTotesListingDocument, options);
-        }
-export function useGetTotesListingSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetTotesListingQuery, GetTotesListingQueryVariables>) {
-          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
-          return Apollo.useSuspenseQuery<GetTotesListingQuery, GetTotesListingQueryVariables>(GetTotesListingDocument, options);
-        }
-export type GetTotesListingQueryHookResult = ReturnType<typeof useGetTotesListingQuery>;
-export type GetTotesListingLazyQueryHookResult = ReturnType<typeof useGetTotesListingLazyQuery>;
-export type GetTotesListingSuspenseQueryHookResult = ReturnType<typeof useGetTotesListingSuspenseQuery>;
-export type GetTotesListingQueryResult = Apollo.QueryResult<GetTotesListingQuery, GetTotesListingQueryVariables>;
+export function useGetTotesListingQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    GetTotesListingQuery,
+    GetTotesListingQueryVariables
+  > &
+    (
+      | { variables: GetTotesListingQueryVariables; skip?: boolean }
+      | { skip: boolean }
+    ),
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GetTotesListingQuery, GetTotesListingQueryVariables>(
+    GetTotesListingDocument,
+    options,
+  );
+}
+export function useGetTotesListingLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GetTotesListingQuery,
+    GetTotesListingQueryVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    GetTotesListingQuery,
+    GetTotesListingQueryVariables
+  >(GetTotesListingDocument, options);
+}
+export function useGetTotesListingSuspenseQuery(
+  baseOptions?:
+    | Apollo.SkipToken
+    | Apollo.SuspenseQueryHookOptions<
+        GetTotesListingQuery,
+        GetTotesListingQueryVariables
+      >,
+) {
+  const options =
+    baseOptions === Apollo.skipToken
+      ? baseOptions
+      : { ...defaultOptions, ...baseOptions };
+  return Apollo.useSuspenseQuery<
+    GetTotesListingQuery,
+    GetTotesListingQueryVariables
+  >(GetTotesListingDocument, options);
+}
+export type GetTotesListingQueryHookResult = ReturnType<
+  typeof useGetTotesListingQuery
+>;
+export type GetTotesListingLazyQueryHookResult = ReturnType<
+  typeof useGetTotesListingLazyQuery
+>;
+export type GetTotesListingSuspenseQueryHookResult = ReturnType<
+  typeof useGetTotesListingSuspenseQuery
+>;
+export type GetTotesListingQueryResult = Apollo.QueryResult<
+  GetTotesListingQuery,
+  GetTotesListingQueryVariables
+>;
