@@ -1,6 +1,5 @@
 import { NestFactory } from '@nestjs/core';
 import { Logger, Module } from '@nestjs/common';
-import { PostController, PostEntity } from './post-service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CacheModule } from '@nestjs/cache-manager';
@@ -29,14 +28,14 @@ import { TotesModule } from './totes/totes.module';
         username: configService.get<string>('DB_USER'),
         password: configService.get<string>('DB_PASSWORD'),
         database: configService.get<string>('DB_NAME'),
-        entities: [PostEntity, ToteEntity], // Add your entities here
+        entities: [ToteEntity], // Add your entities here
         // synchronize: true -> DEVELOPMENT ONLY! Automatically creates/updates schema.
         // WARNING: NEVER use synchronize: true in PRODUCTION. Use migrations instead.
         synchronize: true, // For local dev, set to false in production
         logging: true, // Set to true to see SQL queries (can be verbose)
       }),
     }),
-    TypeOrmModule.forFeature([PostEntity, ToteEntity]),
+    TypeOrmModule.forFeature([ToteEntity]),
     CacheModule.registerAsync({
       useFactory: () => {
         return {
@@ -57,7 +56,6 @@ import { TotesModule } from './totes/totes.module';
       // plugins: [ApolloServerPluginLandingPageLocalDefault()],
     }),
   ],
-  controllers: [PostController],
 })
 class AppModule {}
 

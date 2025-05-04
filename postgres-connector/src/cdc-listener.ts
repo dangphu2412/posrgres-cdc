@@ -107,7 +107,7 @@ export class CdcListenerService implements OnModuleInit, OnApplicationShutdown {
 
       // Provide more detailed logging for actual changes
       if (['insert', 'update', 'delete'].includes(log.tag)) {
-        await this.cache.set(`post:${log.new.id}`, log.new);
+        await this.cache.set(`totes:${log.new.id}`, log.new);
         this.logger.log(`Update cached ${log.new.id}`);
       } else if (log.tag === 'commit') {
         this.logger.verbose(`[LSN: ${lsn}] Transaction Commit.`);

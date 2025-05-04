@@ -1,20 +1,21 @@
-import { PostController, PostEntity } from '../post-service';
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
 import { In, Repository } from 'typeorm';
+import { TotesService } from '../totes/totes.service';
+import { ToteEntity } from '../totes/entities/tote.entity';
 
-describe(PostController.name, () => {
-  let postController: PostController;
-  let postRepository: Repository<PostEntity>;
+describe(TotesService.name, () => {
+  let totesService: TotesService;
+  let repository: Repository<ToteEntity>;
   let cache: Cache;
 
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
-      controllers: [PostController],
       providers: [
+        TotesService,
         {
-          provide: getRepositoryToken(PostEntity),
+          provide: getRepositoryToken(ToteEntity),
           useValue: {
             find: jest.fn(),
           },
@@ -31,61 +32,57 @@ describe(PostController.name, () => {
       ],
     }).compile();
 
-    postController = moduleRef.get(PostController);
-    postRepository = moduleRef.get(getRepositoryToken(PostEntity));
+    totesService = moduleRef.get(TotesService);
+    repository = moduleRef.get(getRepositoryToken(ToteEntity));
     cache = moduleRef.get(CACHE_MANAGER);
   });
 
-  describe('getPosts', () => {
-    it('should fetch posts from DAL and store to cache', async () => {
+  describe('findAll', () => {
+    it('should fetch totes from DAL and store to cache', async () => {
       const sampleDate = new Date();
       const response = [
         {
           id: '1',
-          title: 'title1',
-          content: '',
+          name: 'name1',
           createdAt: sampleDate,
           updatedAt: sampleDate,
         },
         {
           id: '2',
-          title: 'title2',
-          content: '',
+          name: 'name2',
           createdAt: sampleDate,
           updatedAt: sampleDate,
         },
       ];
       jest.spyOn(cache, 'get').mockResolvedValue(null);
-      jest.spyOn(postRepository, 'find').mockResolvedValue(response);
+      jest.spyOn(repository, 'find').mockResolvedValue(response);
 
-      expect(await postController.getPosts(1, 10)).toEqual(response);
-      expect(postRepository.find).toHaveBeenCalledWith({
+      expect(await totesService.findAll(1, 10)).toEqual(response);
+      expect(repository.find).toHaveBeenCalledWith({
         skip: 0,
         take: 10,
       });
       expect(cache.set).toHaveBeenCalledWith(
-        'posts:1:10',
-        ['post:1', 'post:2'],
+        'totes:1:10',
+        ['totes:1', 'totes:2'],
         10000,
       );
       expect(cache.mset).toHaveBeenCalledWith([
         {
-          key: 'post:1',
+          key: 'totes:1',
           value: {
             id: '1',
-            title: 'title1',
-            content: '',
+            name: 'name1',
             createdAt: sampleDate,
             updatedAt: sampleDate,
           },
           ttl: 10000,
         },
         {
-          key: 'post:2',
+          key: 'totes:2',
           value: {
             id: '2',
-            title: 'title2',
-            content: '',
+            name: 'name2',
             createdAt: sampleDate,
             updatedAt: sampleDate,
           },
@@ -99,40 +96,40 @@ describe(PostController.name, () => {
       const response = [
         {
           id: '1',
-          title: 'title1',
-          content: '',
+          name: 'name1',
+
           createdAt: sampleDate,
           updatedAt: sampleDate,
         },
         {
           id: '2',
-          title: 'title2',
-          content: '',
+          name: 'name2',
+
           createdAt: sampleDate,
           updatedAt: sampleDate,
         },
       ];
-      jest.spyOn(cache, 'get').mockResolvedValue(['post:1', 'post:2']);
+      jest.spyOn(cache, 'get').mockResolvedValue(['totes:1', 'totes:2']);
       jest.spyOn(cache, 'mget').mockResolvedValue([
         {
           id: '1',
-          title: 'title1',
-          content: '',
+          name: 'name1',
+
           createdAt: sampleDate,
           updatedAt: sampleDate,
         },
         {
           id: '2',
-          title: 'title2',
-          content: '',
+          name: 'name2',
+
           createdAt: sampleDate,
           updatedAt: sampleDate,
         },
       ]);
 
-      expect(await postController.getPosts(1, 10)).toEqual(response);
-      expect(cache.get).toHaveBeenCalledWith('posts:1:10');
-      expect(cache.mget).toHaveBeenCalledWith(['post:1', 'post:2']);
+      expect(await totesService.findAll(1, 10)).toEqual(response);
+      expect(cache.get).toHaveBeenCalledWith('totes:1:10');
+      expect(cache.mget).toHaveBeenCalledWith(['totes:1', 'totes:2']);
     });
 
     it('should hit partially cached posts from cache store and then merge the patches from DAL', async () => {
@@ -140,75 +137,74 @@ describe(PostController.name, () => {
       const response = [
         {
           id: '1',
-          title: 'title1',
-          content: '',
+          name: 'name1',
+
           createdAt: sampleDate,
           updatedAt: sampleDate,
         },
         {
           id: '2',
-          title: 'title2',
-          content: '',
+          name: 'name2',
+
           createdAt: sampleDate,
           updatedAt: sampleDate,
         },
       ];
-      jest.spyOn(cache, 'get').mockResolvedValue(['post:1', 'post:2']);
+      jest.spyOn(cache, 'get').mockResolvedValue(['totes:1', 'totes:2']);
       // Get details only hit first post
       jest.spyOn(cache, 'mget').mockResolvedValue([
         {
           id: '1',
-          title: 'title1',
-          content: '',
+          name: 'name1',
+
           createdAt: sampleDate,
           updatedAt: sampleDate,
         },
         null,
       ]);
       // Call database to get missing cached
-      jest.spyOn(postRepository, 'find').mockResolvedValue([
+      jest.spyOn(repository, 'find').mockResolvedValue([
         {
           id: '2',
-          title: 'title2',
-          content: '',
+          name: 'name2',
           createdAt: sampleDate,
           updatedAt: sampleDate,
         },
       ]);
 
-      expect(await postController.getPosts(1, 10)).toEqual(response);
+      expect(await totesService.findAll(1, 10)).toEqual(response);
 
-      expect(postRepository.find).toHaveBeenCalledWith({
+      expect(repository.find).toHaveBeenCalledWith({
         where: {
           id: In(['2']),
         },
       });
 
-      expect(cache.get).toHaveBeenCalledWith('posts:1:10');
-      expect(cache.mget).toHaveBeenCalledWith(['post:1', 'post:2']);
+      expect(cache.get).toHaveBeenCalledWith('totes:1:10');
+      expect(cache.mget).toHaveBeenCalledWith(['totes:1', 'totes:2']);
       expect(cache.set).toHaveBeenCalledWith(
-        'posts:1:10',
-        ['post:1', 'post:2'],
+        'totes:1:10',
+        ['totes:1', 'totes:2'],
         10000,
       );
       expect(cache.mset).toHaveBeenCalledWith([
         {
-          key: 'post:1',
+          key: 'totes:1',
           value: {
             id: '1',
-            title: 'title1',
-            content: '',
+            name: 'name1',
+
             createdAt: sampleDate,
             updatedAt: sampleDate,
           },
           ttl: 10000,
         },
         {
-          key: 'post:2',
+          key: 'totes:2',
           value: {
             id: '2',
-            title: 'title2',
-            content: '',
+            name: 'name2',
+
             createdAt: sampleDate,
             updatedAt: sampleDate,
           },

@@ -6,12 +6,6 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-export enum ToteStatus {
-  PENDING = 'PENDING',
-  SHIPPED = 'SHIPPED',
-  DELIVERED = 'DELIVERED',
-}
-
 @Entity('totes')
 export class ToteEntity {
   @PrimaryGeneratedColumn('uuid')
@@ -22,9 +16,6 @@ export class ToteEntity {
 
   @Column({ nullable: true })
   description?: string;
-
-  @Column({ type: 'enum', enum: ToteStatus, default: ToteStatus.PENDING })
-  status: ToteStatus;
 
   @CreateDateColumn()
   createdAt: Date;

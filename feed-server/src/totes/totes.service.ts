@@ -42,7 +42,7 @@ export class TotesService {
   }
 
   private async getCached(page: number, size: number) {
-    const key = `posts:${page}:${size}`;
+    const key = `${TotesService.CACHE_PREFIX}${page}:${size}`;
     const postIdKeys = await this.cache.get<string[]>(key);
     Logger.log(`Getting cached totes ${postIdKeys?.toString()}`);
 
@@ -67,7 +67,7 @@ export class TotesService {
           (i) => `${TotesService.CACHE_PREFIX}${i?.id}` === postId,
         );
       })
-      .map((i) => i.slice('${TotesService.CACHE_PREFIX}'.length));
+      .map((i) => i.slice(TotesService.CACHE_PREFIX.length));
 
     Logger.log(
       `Partial cached hit. Find latest cache from missed: ${diff.toString()}`,
@@ -86,15 +86,15 @@ export class TotesService {
     return merged;
   }
 
-  private async saveCache(page: number, size: number, posts: ToteEntity[]) {
+  private async saveCache(page: number, size: number, totes: ToteEntity[]) {
     Logger.log(`Save cache posts ${page}`);
-    const key = `posts:${page}:${size}`;
-    const postIdKeys = posts.map((i) => `${TotesService.CACHE_PREFIX}${i.id}`);
+    const key = `${TotesService.CACHE_PREFIX}${page}:${size}`;
+    const postIdKeys = totes.map((i) => `${TotesService.CACHE_PREFIX}${i.id}`);
 
     await Promise.all([
       this.cache.set(key, postIdKeys, TotesService.TTL),
       this.cache.mset(
-        posts.map((post) => {
+        totes.map((post) => {
           return {
             key: `${TotesService.CACHE_PREFIX}${post.id}`,
             value: post,
