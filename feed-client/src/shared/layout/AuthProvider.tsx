@@ -3,7 +3,7 @@
 
 import { SessionProvider } from "next-auth/react";
 import { ReactNode } from "react";
-import {apolloClient} from "@/shared/graphql-client/client";
+import {apolloClient} from "@/shared/graphql/apollo-client";
 import { ApolloProvider } from "@apollo/client";
 
 export function AuthProvider({ children }: { children: ReactNode }) {

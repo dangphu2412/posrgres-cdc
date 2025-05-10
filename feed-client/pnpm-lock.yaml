@@ -83,6 +83,9 @@ importers:
       react-dom:
         specifier: ^19.0.0
         version: 19.1.0(react@19.1.0)
+      react-hook-form:
+        specifier: ^7.56.2
+        version: 7.56.2(react@19.1.0)
       sonner:
         specifier: ^2.0.3
         version: 2.0.3(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -100,11 +103,17 @@ importers:
         specifier: ^3
         version: 3.3.1
       '@graphql-codegen/cli':
-        specifier: ^5.0.5
+        specifier: 5.0.5
         version: 5.0.5(@types/node@20.17.30)(graphql-sock@1.0.1(graphql@16.11.0))(graphql@16.11.0)(typescript@5.8.3)
       '@graphql-codegen/client-preset':
-        specifier: ^4.8.0
+        specifier: 4.8.0
         version: 4.8.0(graphql-sock@1.0.1(graphql@16.11.0))(graphql@16.11.0)
+      '@graphql-codegen/client-preset-swc-plugin':
+        specifier: ^0.2.0
+        version: 0.2.0
+      '@graphql-codegen/import-types-preset':
+        specifier: ^3.0.0
+        version: 3.0.0(graphql@16.11.0)
       '@graphql-codegen/typescript':
         specifier: ^4.1.6
         version: 4.1.6(graphql@16.11.0)
@@ -524,6 +533,11 @@ packages:
   '@floating-ui/utils@0.2.9':
     resolution: {integrity: sha512-MDWhGtE+eHw5JW7lq4qhc5yRLS11ERl1c7Z6Xd0a58DozHES6EnNNwUWbMiG4J9Cgj053Bhk8zvlhFYKVhULwg==}
 
+  '@graphql-codegen/add@3.2.3':
+    resolution: {integrity: sha512-sQOnWpMko4JLeykwyjFTxnhqjd/3NOG2OyMuvK76Wnnwh8DRrNf2VEs2kmSvLl7MndMlOj7Kh5U154dVcvhmKQ==}
+    peerDependencies:
+      graphql: ^0.8.0 || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0
+
   '@graphql-codegen/add@5.0.3':
     resolution: {integrity: sha512-SxXPmramkth8XtBlAHu4H4jYcYXM/o3p01+psU+0NADQowA8jtYkK6MW5rV6T+CxkEaNZItfSmZRPgIuypcqnA==}
     peerDependencies:
@@ -540,6 +554,9 @@ packages:
       '@parcel/watcher':
         optional: true
 
+  '@graphql-codegen/client-preset-swc-plugin@0.2.0':
+    resolution: {integrity: sha512-wibvCKuB+pP1ggNzZnkMLQgfyr0l+71kZsfK9M9GxxV8kaFGypbT3eN2XP4U8wH35GTaceLDg9jTg2JSUpcWdg==}
+
   '@graphql-codegen/client-preset@4.8.0':
     resolution: {integrity: sha512-IVtTl7GsPMbQihk5+l5fDYksnPPOoC52sKxzquyIyuecZLEB7W3nNLV29r6+y+tjXTRPA774FR7CHGA2adzhjw==}
     engines: {node: '>=16'}
@@ -555,6 +572,12 @@ packages:
   '@graphql-codegen/gql-tag-operations@4.0.17':
     resolution: {integrity: sha512-2pnvPdIG6W9OuxkrEZ6hvZd142+O3B13lvhrZ48yyEBh2ujtmKokw0eTwDHtlXUqjVS0I3q7+HB2y12G/m69CA==}
     engines: {node: '>=16'}
+    peerDependencies:
+      graphql: ^0.8.0 || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0
+
+  '@graphql-codegen/import-types-preset@3.0.0':
+    resolution: {integrity: sha512-8Gl3cg+YCi0xLB5J71QQkqXvrdJVOTitJy+0YupconZwrd9cRWhN3k+SimtMKpzTVBNN96v1R8yvFLdfVF+iZA==}
+    engines: {node: '>= 16.0.0'}
     peerDependencies:
       graphql: ^0.8.0 || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0
 
@@ -3445,6 +3468,12 @@ packages:
     peerDependencies:
       react: ^19.1.0
 
+  react-hook-form@7.56.2:
+    resolution: {integrity: sha512-vpfuHuQMF/L6GpuQ4c3ZDo+pRYxIi40gQqsCmmfUBwm+oqvBhKhwghCuj2o00YCgSfU6bR9KC/xnQGWm3Gr08A==}
+    engines: {node: '>=18.0.0'}
+    peerDependencies:
+      react: ^16.8.0 || ^17 || ^18 || ^19
+
   react-is@16.13.1:
     resolution: {integrity: sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==}
 
@@ -4560,6 +4589,12 @@ snapshots:
 
   '@floating-ui/utils@0.2.9': {}
 
+  '@graphql-codegen/add@3.2.3(graphql@16.11.0)':
+    dependencies:
+      '@graphql-codegen/plugin-helpers': 3.1.2(graphql@16.11.0)
+      graphql: 16.11.0
+      tslib: 2.4.1
+
   '@graphql-codegen/add@5.0.3(graphql@16.11.0)':
     dependencies:
       '@graphql-codegen/plugin-helpers': 5.1.0(graphql@16.11.0)
@@ -4617,6 +4652,8 @@ snapshots:
       - uWebSockets.js
       - utf-8-validate
 
+  '@graphql-codegen/client-preset-swc-plugin@0.2.0': {}
+
   '@graphql-codegen/client-preset@4.8.0(graphql-sock@1.0.1(graphql@16.11.0))(graphql@16.11.0)':
     dependencies:
       '@babel/helper-plugin-utils': 7.27.1
@@ -4655,6 +4692,17 @@ snapshots:
       tslib: 2.6.3
     transitivePeerDependencies:
       - encoding
+
+  '@graphql-codegen/import-types-preset@3.0.0(graphql@16.11.0)':
+    dependencies:
+      '@graphql-codegen/add': 3.2.3(graphql@16.11.0)
+      '@graphql-codegen/plugin-helpers': 3.1.2(graphql@16.11.0)
+      '@graphql-codegen/visitor-plugin-common': 2.13.1(graphql@16.11.0)
+      graphql: 16.11.0
+      tslib: 2.6.3
+    transitivePeerDependencies:
+      - encoding
+      - supports-color
 
   '@graphql-codegen/plugin-helpers@2.7.2(graphql@16.11.0)':
     dependencies:
@@ -7876,6 +7924,10 @@ snapshots:
     dependencies:
       react: 19.1.0
       scheduler: 0.26.0
+
+  react-hook-form@7.56.2(react@19.1.0):
+    dependencies:
+      react: 19.1.0
 
   react-is@16.13.1: {}
 

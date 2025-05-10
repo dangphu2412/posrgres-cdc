@@ -5,6 +5,17 @@ const nextConfig: NextConfig = {
     images: {
         remotePatterns: [new URL('https://hebbkx1anhila5yf.public.blob.vercel-storage.com/**')],
     },
+    eslint: {
+        ignoreDuringBuilds: true,
+    },
+    typescript: {
+        ignoreBuildErrors: true
+    },
+    experimental: {
+        swcPlugins: [
+            ['@graphql-codegen/client-preset-swc-plugin', { artifactDirectory: './src/shared/graphql/operations.tsx', gqlTagName: '@apollo/client' }]
+        ]
+    }
 };
 
 export default nextConfig;

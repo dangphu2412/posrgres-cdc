@@ -1,0 +1,6 @@
+query AllTotesListing($page: Float!, $size: Float!) {
+    totes(page: $page, size: $size) {
+        id
+        name
+    }
+}
