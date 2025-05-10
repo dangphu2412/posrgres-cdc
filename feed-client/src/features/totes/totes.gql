@@ -15,3 +15,21 @@ query SearchTotesDashboard($page: Float!, $size: Float!) {
         material
     }
 }
+
+query GetQuickViewTote($id: String!) {
+    tote(id: $id) {
+        id
+        name
+        color
+        description
+        bannerURL
+        price
+        rating
+        size
+        style
+        inStock
+        isBestSeller
+        isNewArrival
+        material
+    }
+}

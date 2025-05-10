@@ -18,38 +18,48 @@ import {
 } from "@/components/ui/dialog"
 import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group"
 import {Separator} from "@/components/ui/separator"
-import {type Product, useToteStore} from "@/features/totes/totes.store"
+import {Product, useToteStore} from "@/features/totes/totes.store"
+import {useGetQuickViewToteQuery} from "@/shared/graphql/operations";
 
 interface QuickViewDialogProps {
-    product: Product
+    id: string;
     trigger?: React.ReactNode
     open?: boolean
     onOpenChange?: (open: boolean) => void
 }
 
-export function QuickViewDialog({ product, trigger, open, onOpenChange }: QuickViewDialogProps) {
+
+// Color options with their hex values
+const colorOptions = [
+    { name: "black", hex: "#000000" },
+    { name: "white", hex: "#ffffff" },
+    { name: "beige", hex: "#f5f5dc" },
+    { name: "brown", hex: "#964b00" },
+    { name: "pastel", hex: "#ffd1dc" },
+    { name: "bright", hex: "#ff4500" },
+]
+
+// Size options
+const sizeOptions = ["small", "medium", "large"]
+
+export function QuickViewDialog({ id, trigger, open, onOpenChange }: QuickViewDialogProps) {
+    const { data } = useGetQuickViewToteQuery({
+        variables: {
+            id
+        },
+        skip: !open
+    })
     const { addToCart } = useToteStore()
-    const [selectedSize, setSelectedSize] = useState(product.size)
+    const [selectedSize, setSelectedSize] = useState(sizeOptions[0])
     const [quantity, setQuantity] = useState(1)
 
-    // Color options with their hex values
-    const colorOptions = [
-        { name: "black", hex: "#000000" },
-        { name: "white", hex: "#ffffff" },
-        { name: "beige", hex: "#f5f5dc" },
-        { name: "brown", hex: "#964b00" },
-        { name: "pastel", hex: "#ffd1dc" },
-        { name: "bright", hex: "#ff4500" },
-    ]
+    const product = data?.tote;
 
-    // Size options
-    const sizeOptions = ["small", "medium", "large"]
-
-    const handleAddToCart = () => {
+    function handleAddToCart() {
         const productToAdd = {
-            ...product,
+            ...data?.tote,
             size: selectedSize,
-        }
+        } as Product
 
         // Add to cart multiple times based on quantity
         for (let i = 0; i < quantity; i++) {
@@ -64,8 +74,17 @@ export function QuickViewDialog({ product, trigger, open, onOpenChange }: QuickV
         }
     }
 
-    const incrementQuantity = () => setQuantity((prev) => prev + 1)
-    const decrementQuantity = () => setQuantity((prev) => Math.max(1, prev - 1))
+    function incrementQuantity() {
+        setQuantity((prev) => prev + 1);
+    }
+
+    function decrementQuantity() {
+        setQuantity((prev) => Math.max(1, prev - 1));
+    }
+
+    if (!product) {
+        return null;
+    }
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
@@ -157,7 +176,7 @@ export function QuickViewDialog({ product, trigger, open, onOpenChange }: QuickV
                             {/* Size Selection */}
                             <div>
                                 <h3 className="text-sm font-medium mb-3">Size</h3>
-                                <RadioGroup value={selectedSize} onValueChange={setSelectedSize} className="flex gap-3">
+                                <RadioGroup value={product.size} onValueChange={setSelectedSize} className="flex gap-3">
                                     {sizeOptions.map((size) => (
                                         <div key={size} className="flex items-center">
                                             <RadioGroupItem value={size} id={`size-${size}`} className="peer sr-only" />
