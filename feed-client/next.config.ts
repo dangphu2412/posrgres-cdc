@@ -11,11 +11,6 @@ const nextConfig: NextConfig = {
     typescript: {
         ignoreBuildErrors: true
     },
-    experimental: {
-        swcPlugins: [
-            ['@graphql-codegen/client-preset-swc-plugin', { artifactDirectory: './src/shared/graphql/operations.tsx', gqlTagName: '@apollo/client' }]
-        ]
-    }
 };
 
 export default nextConfig;

@@ -108,9 +108,6 @@ importers:
       '@graphql-codegen/client-preset':
         specifier: 4.8.0
         version: 4.8.0(graphql-sock@1.0.1(graphql@16.11.0))(graphql@16.11.0)
-      '@graphql-codegen/client-preset-swc-plugin':
-        specifier: ^0.2.0
-        version: 0.2.0
       '@graphql-codegen/import-types-preset':
         specifier: ^3.0.0
         version: 3.0.0(graphql@16.11.0)
@@ -553,9 +550,6 @@ packages:
     peerDependenciesMeta:
       '@parcel/watcher':
         optional: true
-
-  '@graphql-codegen/client-preset-swc-plugin@0.2.0':
-    resolution: {integrity: sha512-wibvCKuB+pP1ggNzZnkMLQgfyr0l+71kZsfK9M9GxxV8kaFGypbT3eN2XP4U8wH35GTaceLDg9jTg2JSUpcWdg==}
 
   '@graphql-codegen/client-preset@4.8.0':
     resolution: {integrity: sha512-IVtTl7GsPMbQihk5+l5fDYksnPPOoC52sKxzquyIyuecZLEB7W3nNLV29r6+y+tjXTRPA774FR7CHGA2adzhjw==}
@@ -4651,8 +4645,6 @@ snapshots:
       - typescript
       - uWebSockets.js
       - utf-8-validate
-
-  '@graphql-codegen/client-preset-swc-plugin@0.2.0': {}
 
   '@graphql-codegen/client-preset@4.8.0(graphql-sock@1.0.1(graphql@16.11.0))(graphql@16.11.0)':
     dependencies:

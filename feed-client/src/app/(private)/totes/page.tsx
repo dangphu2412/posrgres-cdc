@@ -1,331 +1,42 @@
 "use client"
 
-import {Filter, Search, SlidersHorizontal} from "lucide-react"
+import { Filter, Search, SlidersHorizontal } from "lucide-react"
 import Image from "next/image"
-import {useCallback, useEffect, useState} from "react"
 
-import {Badge} from "@/components/ui/badge"
-import {Button} from "@/components/ui/button"
-import {Card, CardContent, CardHeader} from "@/components/ui/card"
-import {Input} from "@/components/ui/input"
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select"
-import {SidebarProvider, SidebarTrigger} from "@/components/ui/sidebar"
-import {toast} from "sonner"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
+import { useToteStore } from "@/features/totes/totes.store"
+import {toast} from "sonner";
 import {ToteFilters} from "@/features/totes/tote-filters";
-import {useAllTotesListingQuery} from "@/shared/graphql/operations";
-
-// Product interface
-interface Product {
-    id: string
-    name: string
-    price: number
-    rating: number
-    image: string
-    color: string
-    material: string
-    size: string
-    isNewArrival: boolean
-    isBestSeller: boolean
-    inStock: boolean
-    style: string[]
-}
-
-// Cart item interface
-interface CartItem extends Product {
-    quantity: number
-}
 
 export default function TotesPage() {
-    // State for mobile filter drawer
-    const [showMobileFilters, setShowMobileFilters] = useState(false)
+    // Get state and actions from the store
+    const {
+        filteredProducts,
+        products,
+        filters,
+        sortOption,
+        showMobileFilters,
+        setShowMobileFilters,
+        setSortOption,
+        updateFilter,
+        resetFilters,
+        addToCart,
+    } = useToteStore()
 
-    // State for cart items
-    const [cartItems, setCartItems] = useState<CartItem[]>([])
-
-    const { data } = useAllTotesListingQuery({
-        variables: {
-            page: 1,
-            size: 10,
-        }
-    });
-
-    // State for products with initial data
-    const [products, setProducts] = useState<Product[]>([
-        {
-            id: "1",
-            name: "Monocle Canvas Tote Bag",
-            price: 213.99,
-            rating: 4.9,
-            color: "beige",
-            material: "canvas",
-            size: "large",
-            isNewArrival: true,
-            isBestSeller: true,
-            inStock: true,
-            style: ["everyday", "work"],
-            image:
-                "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/The%20Best%20Media%20Tote%20Bags,%20Ranked.jpg-z2O2nGPSTrjey8xEM1cc5aTI2ggjXE.jpeg",
-        },
-        {
-            id: "2",
-            name: "Square One District Tote",
-            price: 189.99,
-            rating: 4.9,
-            color: "black",
-            material: "canvas",
-            size: "medium",
-            isNewArrival: false,
-            isBestSeller: true,
-            inStock: true,
-            style: ["minimalist", "work"],
-            image:
-                "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Index,%20Vanderbrand.jpg-Fv7HHkBaQgZe7HG3hbz5aojPoFRIuo.jpeg",
-        },
-        {
-            id: "3",
-            name: "Sporty & Rich Canvas Tote",
-            price: 221.99,
-            rating: 4.9,
-            color: "white",
-            material: "canvas",
-            size: "large",
-            isNewArrival: true,
-            isBestSeller: false,
-            inStock: true,
-            style: ["everyday", "travel"],
-            image:
-                "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/download%20(2).jpg-zbeT25jMphcVf4DmpAlTVsGALg88Zn.jpeg",
-        },
-        {
-            id: "4",
-            name: "Eco-Friendly Jute Tote",
-            price: 49.99,
-            rating: 4.7,
-            color: "brown",
-            material: "jute",
-            size: "medium",
-            isNewArrival: false,
-            isBestSeller: false,
-            inStock: true,
-            style: ["eco-friendly", "everyday"],
-            image: "/placeholder.svg?height=400&width=400",
-        },
-        {
-            id: "5",
-            name: "Premium Leather Tote",
-            price: 299.99,
-            rating: 4.8,
-            color: "brown",
-            material: "leather",
-            size: "large",
-            isNewArrival: false,
-            isBestSeller: true,
-            inStock: true,
-            style: ["work", "minimalist"],
-            image: "/placeholder.svg?height=400&width=400",
-        },
-        {
-            id: "6",
-            name: "Pastel Cotton Mini Tote",
-            price: 39.99,
-            rating: 4.5,
-            color: "pastel",
-            material: "cotton",
-            size: "small",
-            isNewArrival: true,
-            isBestSeller: false,
-            inStock: true,
-            style: ["everyday", "boho"],
-            image: "/placeholder.svg?height=400&width=400",
-        },
-        {
-            id: "7",
-            name: "Limited Edition Art Tote",
-            price: 149.99,
-            rating: 4.9,
-            color: "bright",
-            material: "canvas",
-            size: "medium",
-            isNewArrival: true,
-            isBestSeller: false,
-            inStock: false,
-            style: ["boho", "travel"],
-            image: "/placeholder.svg?height=400&width=400",
-        },
-        {
-            id: "8",
-            name: "Recycled Plastic Beach Tote",
-            price: 79.99,
-            rating: 4.6,
-            color: "bright",
-            material: "recycled",
-            size: "large",
-            isNewArrival: false,
-            isBestSeller: false,
-            inStock: true,
-            style: ["travel", "eco-friendly"],
-            image: "/placeholder.svg?height=400&width=400",
-        },
-        {
-            id: "9",
-            name: "Minimalist Black Canvas Tote",
-            price: 89.99,
-            rating: 4.8,
-            color: "black",
-            material: "canvas",
-            size: "medium",
-            isNewArrival: false,
-            isBestSeller: true,
-            inStock: true,
-            style: ["minimalist", "work"],
-            image: "/placeholder.svg?height=400&width=400",
-        },
-    ])
-
-    // State for filtered products
-    const [filteredProducts, setFilteredProducts] = useState<Product[]>(products)
-
-    // State for filters
-    const [filters, setFilters] = useState({
-        colors: [] as string[],
-        priceRange: { min: 0, max: 300 },
-        materials: [] as string[],
-        sizes: [] as string[],
-        tags: [] as string[],
-        availability: "all",
-        minRating: 0,
-        styles: [] as string[],
-        searchQuery: "",
-    })
-
-    // State for sorting
-    const [sortOption, setSortOption] = useState("featured")
-
-    // Update quantity in cart
-    const updateQuantity = useCallback((itemId: string, change: number) => {
-        setCartItems(
-            (prevItems) =>
-                prevItems
-                    .map((item) => {
-                        if (item.id === itemId) {
-                            const newQuantity = Math.max(0, item.quantity + change)
-                            if (newQuantity === 0) {
-                                toast("Item removed", {
-                                    description: `${item.name} has been removed from your cart.`,
-                                })
-                                return null
-                            }
-                            return { ...item, quantity: newQuantity }
-                        }
-                        return item
-                    })
-                    .filter(Boolean) as CartItem[],
-        )
-    }, [])
-
-    // Add to cart function
-    const addToCart = useCallback((product: Product) => {
-        setCartItems((prevItems) => {
-            const existingItem = prevItems.find((cartItem) => cartItem.id === product.id)
-            if (existingItem) {
-                return prevItems.map((cartItem) =>
-                    cartItem.id === product.id ? { ...cartItem, quantity: cartItem.quantity + 1 } : cartItem,
-                )
-            }
-            toast("Item added to cart", {
-                description: `${product.name} has been added to your cart.`,
-            })
-            return [...prevItems, { ...product, quantity: 1 }]
-        })
-    }, [])
-
-    // Apply filters function
-    const applyFilters = useCallback(() => {
-        let result = [...products]
-
-        // Filter by search query
-        if (filters.searchQuery) {
-            const query = filters.searchQuery.toLowerCase()
-            result = result.filter(
-                (product) => product.name.toLowerCase().includes(query) || product.material.toLowerCase().includes(query),
-            )
-        }
-
-        // Filter by colors
-        if (filters.colors.length > 0) {
-            result = result.filter((product) => filters.colors.includes(product.color))
-        }
-
-        // Filter by price range
-        result = result.filter(
-            (product) => product.price >= filters.priceRange.min && product.price <= filters.priceRange.max,
-        )
-
-        // Filter by materials
-        if (filters.materials.length > 0) {
-            result = result.filter((product) => filters.materials.includes(product.material))
-        }
-
-        // Filter by sizes
-        if (filters.sizes.length > 0) {
-            result = result.filter((product) => filters.sizes.includes(product.size))
-        }
-
-        // Filter by tags (new arrivals, best sellers)
-        if (filters.tags.length > 0) {
-            result = result.filter(
-                (product) =>
-                    (filters.tags.includes("new") && product.isNewArrival) ||
-                    (filters.tags.includes("bestseller") && product.isBestSeller),
-            )
-        }
-
-        // Filter by availability
-        if (filters.availability === "instock") {
-            result = result.filter((product) => product.inStock)
-        } else if (filters.availability === "preorder") {
-            result = result.filter((product) => !product.inStock)
-        }
-
-        // Filter by minimum rating
-        if (filters.minRating > 0) {
-            result = result.filter((product) => product.rating >= filters.minRating)
-        }
-
-        // Filter by styles
-        if (filters.styles.length > 0) {
-            result = result.filter((product) => product.style.some((style) => filters.styles.includes(style)))
-        }
-
-        // Apply sorting
-        if (sortOption === "price-asc") {
-            result.sort((a, b) => a.price - b.price)
-        } else if (sortOption === "price-desc") {
-            result.sort((a, b) => b.price - a.price)
-        } else if (sortOption === "rating") {
-            result.sort((a, b) => b.rating - a.rating)
-        }
-        // "featured" sorting is default order
-
-        setFilteredProducts(result)
-    }, [filters, products, sortOption])
-
-    // Apply filters whenever filters or sort option changes
-    useEffect(() => {
-        applyFilters()
-    }, [filters, sortOption, applyFilters])
-
-    // Handle filter changes
-    const handleFilterChange = (filterType: string, value: any) => {
-        setFilters((prev) => ({
-            ...prev,
-            [filterType]: value,
-        }))
+    // Handle adding to cart with toast notification
+    const handleAddToCart = (product: any) => {
+        addToCart(product)
     }
 
     return (
         <SidebarProvider>
             <div className="flex min-h-screen bg-[#fcfdfd]">
+
                 {/* Main Content */}
                 <main className="flex-1 px-4 py-6 md:px-8 md:py-8">
                     <header className="mb-8 flex items-center justify-between">
@@ -343,7 +54,7 @@ export default function TotesPage() {
                                     className="w-64 pl-10"
                                     placeholder="Search totes..."
                                     value={filters.searchQuery}
-                                    onChange={(e) => handleFilterChange("searchQuery", e.target.value)}
+                                    onChange={(e) => updateFilter("searchQuery", e.target.value)}
                                 />
                             </div>
                         </div>
@@ -398,34 +109,15 @@ export default function TotesPage() {
                                 </Button>
                             </div>
                             <div className="overflow-y-auto h-[calc(100vh-120px)]">
-                                <ToteFilters filters={filters} onFilterChange={handleFilterChange} />
+                                <ToteFilters />
                             </div>
                             <div className="mt-6 flex gap-4">
-                                <Button
-                                    variant="outline"
-                                    className="flex-1"
-                                    onClick={() => {
-                                        setFilters({
-                                            colors: [],
-                                            priceRange: { min: 0, max: 300 },
-                                            materials: [],
-                                            sizes: [],
-                                            tags: [],
-                                            availability: "all",
-                                            minRating: 0,
-                                            styles: [],
-                                            searchQuery: "",
-                                        })
-                                    }}
-                                >
+                                <Button variant="outline" className="flex-1" onClick={resetFilters}>
                                     Clear All
                                 </Button>
                                 <Button
                                     className="flex-1 bg-[#415444] hover:bg-[#415444]/90"
-                                    onClick={() => {
-                                        applyFilters()
-                                        setShowMobileFilters(false)
-                                    }}
+                                    onClick={() => setShowMobileFilters(false)}
                                 >
                                     Apply Filters
                                 </Button>
@@ -437,27 +129,11 @@ export default function TotesPage() {
                             <div className="sticky top-8 space-y-6">
                                 <div className="flex items-center justify-between">
                                     <h3 className="text-lg font-semibold">Filters</h3>
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={() => {
-                                            setFilters({
-                                                colors: [],
-                                                priceRange: { min: 0, max: 300 },
-                                                materials: [],
-                                                sizes: [],
-                                                tags: [],
-                                                availability: "all",
-                                                minRating: 0,
-                                                styles: [],
-                                                searchQuery: "",
-                                            })
-                                        }}
-                                    >
+                                    <Button variant="ghost" size="sm" onClick={resetFilters}>
                                         Clear All
                                     </Button>
                                 </div>
-                                <ToteFilters filters={filters} onFilterChange={handleFilterChange} />
+                                <ToteFilters />
                             </div>
                         </div>
 
@@ -502,7 +178,7 @@ export default function TotesPage() {
                                                 <button
                                                     className="ml-2"
                                                     onClick={() =>
-                                                        handleFilterChange(
+                                                        updateFilter(
                                                             "colors",
                                                             filters.colors.filter((c) => c !== color),
                                                         )
@@ -518,7 +194,7 @@ export default function TotesPage() {
                                                 <button
                                                     className="ml-2"
                                                     onClick={() =>
-                                                        handleFilterChange(
+                                                        updateFilter(
                                                             "materials",
                                                             filters.materials.filter((m) => m !== material),
                                                         )
@@ -534,7 +210,7 @@ export default function TotesPage() {
                                                 <button
                                                     className="ml-2"
                                                     onClick={() =>
-                                                        handleFilterChange(
+                                                        updateFilter(
                                                             "sizes",
                                                             filters.sizes.filter((s) => s !== size),
                                                         )
@@ -550,7 +226,7 @@ export default function TotesPage() {
                                                 <button
                                                     className="ml-2"
                                                     onClick={() =>
-                                                        handleFilterChange(
+                                                        updateFilter(
                                                             "tags",
                                                             filters.tags.filter((t) => t !== tag),
                                                         )
@@ -566,7 +242,7 @@ export default function TotesPage() {
                                                 <button
                                                     className="ml-2"
                                                     onClick={() =>
-                                                        handleFilterChange(
+                                                        updateFilter(
                                                             "styles",
                                                             filters.styles.filter((s) => s !== style),
                                                         )
@@ -579,7 +255,7 @@ export default function TotesPage() {
                                         {filters.availability !== "all" && (
                                             <Badge variant="secondary" className="px-3 py-1">
                                                 {filters.availability === "instock" ? "In Stock" : "Pre-order"}
-                                                <button className="ml-2" onClick={() => handleFilterChange("availability", "all")}>
+                                                <button className="ml-2" onClick={() => updateFilter("availability", "all")}>
                                                     ×
                                                 </button>
                                             </Badge>
@@ -587,7 +263,7 @@ export default function TotesPage() {
                                         {filters.minRating > 0 && (
                                             <Badge variant="secondary" className="px-3 py-1">
                                                 {filters.minRating}+ Stars
-                                                <button className="ml-2" onClick={() => handleFilterChange("minRating", 0)}>
+                                                <button className="ml-2" onClick={() => updateFilter("minRating", 0)}>
                                                     ×
                                                 </button>
                                             </Badge>
@@ -662,7 +338,7 @@ export default function TotesPage() {
                                                         variant="outline"
                                                         size="sm"
                                                         className="rounded-full hover:bg-[#415444] hover:text-white transition-colors"
-                                                        onClick={() => addToCart(product)}
+                                                        onClick={() => handleAddToCart(product)}
                                                     >
                                                         Add to Cart
                                                     </Button>

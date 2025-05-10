@@ -7,23 +7,11 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Slider } from "@/components/ui/slider"
+import { type Filters, useToteStore } from "@/features/totes/totes.store"
 
-interface FiltersProps {
-    filters: {
-        colors: string[]
-        priceRange: { min: number; max: number }
-        materials: string[]
-        sizes: string[]
-        tags: string[]
-        availability: string
-        minRating: number
-        styles: string[]
-        searchQuery: string
-    }
-    onFilterChange: (filterType: string, value: any) => void
-}
+export function ToteFilters() {
+    const { filters, updateFilter } = useToteStore()
 
-export function ToteFilters({ filters, onFilterChange }: FiltersProps) {
     // Color options with their hex values
     const colorOptions = [
         { name: "black", hex: "#000000" },
@@ -44,17 +32,17 @@ export function ToteFilters({ filters, onFilterChange }: FiltersProps) {
     const styleOptions = ["everyday", "work", "travel", "eco-friendly", "minimalist", "boho"]
 
     // Handle checkbox change for array-based filters
-    const handleCheckboxChange = (filterType: string, value: string) => {
-        const currentValues = filters[filterType as keyof typeof filters] as string[]
+    const handleCheckboxChange = (filterType: keyof Filters, value: string) => {
+        const currentValues = filters[filterType] as string[]
         const newValues = currentValues.includes(value)
             ? currentValues.filter((item) => item !== value)
             : [...currentValues, value]
-        onFilterChange(filterType, newValues)
+        updateFilter(filterType, newValues)
     }
 
     // Handle price range change
     const handlePriceChange = (value: number[]) => {
-        onFilterChange("priceRange", { min: value[0], max: value[1] })
+        updateFilter("priceRange", { min: value[0], max: value[1] })
     }
 
     return (
@@ -116,7 +104,7 @@ export function ToteFilters({ filters, onFilterChange }: FiltersProps) {
                                             ? "bg-[#415444] text-white"
                                             : "bg-gray-100 hover:bg-gray-200"
                                     }`}
-                                    onClick={() => onFilterChange("priceRange", { min: 0, max: 50 })}
+                                    onClick={() => updateFilter("priceRange", { min: 0, max: 50 })}
                                 >
                                     Under $50
                                 </button>
@@ -126,7 +114,7 @@ export function ToteFilters({ filters, onFilterChange }: FiltersProps) {
                                             ? "bg-[#415444] text-white"
                                             : "bg-gray-100 hover:bg-gray-200"
                                     }`}
-                                    onClick={() => onFilterChange("priceRange", { min: 50, max: 150 })}
+                                    onClick={() => updateFilter("priceRange", { min: 50, max: 150 })}
                                 >
                                     $50 - $150
                                 </button>
@@ -136,7 +124,7 @@ export function ToteFilters({ filters, onFilterChange }: FiltersProps) {
                                             ? "bg-[#415444] text-white"
                                             : "bg-gray-100 hover:bg-gray-200"
                                     }`}
-                                    onClick={() => onFilterChange("priceRange", { min: 150, max: 300 })}
+                                    onClick={() => updateFilter("priceRange", { min: 150, max: 300 })}
                                 >
                                     $150+
                                 </button>
@@ -230,7 +218,7 @@ export function ToteFilters({ filters, onFilterChange }: FiltersProps) {
                     <AccordionContent>
                         <RadioGroup
                             value={filters.availability}
-                            onValueChange={(value) => onFilterChange("availability", value)}
+                            onValueChange={(value) => updateFilter("availability", value)}
                             className="pt-2"
                         >
                             <div className="flex items-center space-x-2">
@@ -263,7 +251,7 @@ export function ToteFilters({ filters, onFilterChange }: FiltersProps) {
                     flex items-center w-full py-2 px-3 rounded-md text-sm
                     ${filters.minRating === rating ? "bg-[#e0e5ce] text-[#415444]" : "hover:bg-gray-50"}
                   `}
-                                    onClick={() => onFilterChange("minRating", filters.minRating === rating ? 0 : rating)}
+                                    onClick={() => updateFilter("minRating", filters.minRating === rating ? 0 : rating)}
                                 >
                                     <div className="flex items-center">
                                         {[...Array(5)].map((_, i) => (

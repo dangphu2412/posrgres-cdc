@@ -25,11 +25,19 @@ type Query {
 
 type Tote {
   bannerURL: String!
+  color: String!
   createdAt: DateTime!
   description: String
   id: ID!
+  inStock: Boolean!
+  isBestSeller: Boolean!
+  isNewArrival: Boolean!
+  material: String!
   name: String!
   price: Float!
+  rating: Float!
+  size: String!
+  style: [String!]!
   updatedAt: DateTime!
 }
 
