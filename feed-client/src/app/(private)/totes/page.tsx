@@ -1,17 +1,18 @@
 "use client"
 
-import { Filter, Search, SlidersHorizontal } from "lucide-react"
+import {Filter, Search, SlidersHorizontal} from "lucide-react"
 import Image from "next/image"
 
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
-import { useToteStore } from "@/features/totes/totes.store"
-import {toast} from "sonner";
+import {Badge} from "@/components/ui/badge"
+import {Button} from "@/components/ui/button"
+import {Card, CardContent, CardHeader} from "@/components/ui/card"
+import {Input} from "@/components/ui/input"
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select"
+import {SidebarProvider, SidebarTrigger} from "@/components/ui/sidebar"
+import {useToteStore} from "@/features/totes/totes.store"
 import {ToteFilters} from "@/features/totes/tote-filters";
+import {useSearchTotesDashboardQuery} from "@/shared/graphql/operations";
+import {useEffect} from "react";
 
 export default function TotesPage() {
     // Get state and actions from the store
@@ -27,6 +28,22 @@ export default function TotesPage() {
         resetFilters,
         addToCart,
     } = useToteStore()
+
+    const { data } = useSearchTotesDashboardQuery({
+        variables: {
+            page: 1,
+            size: 20
+        }
+    })
+
+    useEffect(() => {
+        if (data !== undefined) {
+            useToteStore.setState({
+                products: data.totes,
+                filteredProducts: data.totes
+            })
+        }
+    }, [data])
 
     // Handle adding to cart with toast notification
     const handleAddToCart = (product: any) => {
@@ -306,7 +323,7 @@ export default function TotesPage() {
                                                     </Badge>
                                                 )}
                                                 <Image
-                                                    src={product.image || "/placeholder.svg"}
+                                                    src={product.bannerURL || "/placeholder.svg"}
                                                     alt={product.name}
                                                     width={400}
                                                     height={400}

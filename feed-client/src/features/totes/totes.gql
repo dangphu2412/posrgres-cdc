@@ -1,6 +1,17 @@
-query AllTotesListing($page: Float!, $size: Float!) {
+query SearchTotesDashboard($page: Float!, $size: Float!) {
     totes(page: $page, size: $size) {
         id
         name
+        color
+        description
+        bannerURL
+        price
+        rating
+        size
+        style
+        inStock
+        isBestSeller
+        isNewArrival
+        material
     }
 }
