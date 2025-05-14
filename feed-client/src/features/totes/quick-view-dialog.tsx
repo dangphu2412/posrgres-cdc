@@ -19,7 +19,7 @@ import {
 import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group"
 import {Separator} from "@/components/ui/separator"
 import {Product, useToteStore} from "@/features/totes/totes.store"
-import {useGetQuickViewToteQuery} from "@/shared/graphql/operations";
+import {useGetQuickViewToteQuery} from "@/features/totes/totes.graphql";
 
 interface QuickViewDialogProps {
     id: string;

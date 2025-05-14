@@ -9,9 +9,9 @@ import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/c
 import {SidebarProvider, SidebarTrigger} from "@/components/ui/sidebar"
 import {useToteStore} from "@/features/totes/totes.store"
 import {ToteFilters} from "@/features/totes/tote-filters";
-import {useSearchTotesDashboardQuery} from "@/shared/graphql/operations";
 import {useEffect} from "react";
 import {ProductCard} from "@/features/totes/product-card";
+import {useSearchTotesDashboardQuery} from "@/features/totes/totes.graphql";
 
 export default function TotesPage() {
     // Get state and actions from the store

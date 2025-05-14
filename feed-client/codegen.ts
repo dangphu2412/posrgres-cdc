@@ -3,9 +3,7 @@ import type { CodegenConfig } from '@graphql-codegen/cli';
 
 const config: CodegenConfig = {
   schema: "http://localhost:3000/graphql",
-  documents: "src/features/**/*.gql",
   ignoreNoDocuments: true,
-  hooks: {},
   generates: {
     'src/shared/graphql/models.ts': {
       plugins: ['typescript', 'typescript-operations'],
@@ -16,22 +14,23 @@ const config: CodegenConfig = {
         },
       },
     },
-    "src/shared/graphql/operations.tsx": {
-      preset: 'import-types',
+    'src/features/': {
+      preset: 'near-operation-file',
+      documents: "src/features/**/*.gql",
       presetConfig: {
-        typesPath: './models', // Relative path to types.ts (without extension)
+        baseTypesPath: '../../shared/graphql/models.ts', // relative to the .ts file location
+        extension: '.graphql.ts',
+        folder: '.', // put generated files alongside their .graphql
       },
-      plugins: [
-        'typescript-operations',
-        'typescript-react-apollo',
-      ],
+      plugins: ['typescript-operations', 'typescript-react-apollo'],
       config: {
-        withHooks: true,
-        withHOC: false,
-        withComponent: false,
-        reactApolloVersion: 3,
-        gqlImport: '@apollo/client#gql', // Keeps the gql masking
+        scalars: {
+          DateTime: 'string',
+        },
         useTypeImports: true,
+        withHooks: true,
+        withComponent: false,
+        withHOC: false,
       },
     },
   }
