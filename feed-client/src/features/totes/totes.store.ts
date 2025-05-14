@@ -105,41 +105,12 @@ export const useToteStore = create<ToteStore>()((set, get) => ({
     const { products, filters, sortOption } = get();
     let result = [...products];
 
-    // Filter by search query
-    if (filters.searchQuery) {
-      const query = filters.searchQuery.toLowerCase();
-      result = result.filter(
-        (product) =>
-          product.name.toLowerCase().includes(query) ||
-          product.material.toLowerCase().includes(query),
-      );
-    }
-
-    // Filter by colors
-    if (filters.colors.length > 0) {
-      result = result.filter((product) =>
-        filters.colors.includes(product.color),
-      );
-    }
-
     // Filter by price range
     result = result.filter(
       (product) =>
         product.price >= filters.priceRange.min &&
         product.price <= filters.priceRange.max,
     );
-
-    // Filter by materials
-    if (filters.materials.length > 0) {
-      result = result.filter((product) =>
-        filters.materials.includes(product.material),
-      );
-    }
-
-    // Filter by sizes
-    if (filters.sizes.length > 0) {
-      result = result.filter((product) => filters.sizes.includes(product.size));
-    }
 
     // Filter by tags (new arrivals, best sellers)
     if (filters.tags.length > 0) {

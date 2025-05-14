@@ -9,15 +9,11 @@ import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/c
 import {SidebarProvider, SidebarTrigger} from "@/components/ui/sidebar"
 import {useToteStore} from "@/features/totes/totes.store"
 import {ToteFilters} from "@/features/totes/tote-filters";
-import {useEffect} from "react";
 import {ProductCard} from "@/features/totes/product-card";
-import {useSearchTotesDashboardQuery} from "@/features/totes/totes.graphql";
+import {SearchTotesDashboardQuery, useSearchTotesDashboardQuery} from "@/features/totes/totes.graphql";
 
 export default function TotesPage() {
-    // Get state and actions from the store
     const {
-        filteredProducts,
-        products,
         filters,
         sortOption,
         showMobileFilters,
@@ -32,19 +28,16 @@ export default function TotesPage() {
         variables: {
             getTotesInput: {
                 page: 1,
-                size: 20
+                size: 20,
+                searchQuery: filters.searchQuery,
+                colors: filters.colors,
+                sizes: filters.sizes,
+                materials: filters.materials,
             }
         }
-    })
+    });
 
-    useEffect(() => {
-        if (data !== undefined) {
-            useToteStore.setState({
-                products: data.totes,
-                filteredProducts: data.totes
-            })
-        }
-    }, [data])
+    const products = (data?.totes ?? []) as Required<SearchTotesDashboardQuery['totes']>;
 
     // Handle adding to cart with toast notification
     const handleAddToCart = (product: any) => {
@@ -161,7 +154,7 @@ export default function TotesPage() {
                             <div className="hidden lg:flex items-center justify-between mb-6">
                                 <div className="flex items-center gap-2">
                                     <p className="text-sm text-gray-500">
-                                        Showing {filteredProducts.length} of {products.length} products
+                                        Showing {products.length} of 200 products
                                     </p>
                                 </div>
                                 <div className="flex items-center gap-2">
@@ -291,7 +284,7 @@ export default function TotesPage() {
                             )}
 
                             {/* Products */}
-                            {filteredProducts.length === 0 ? (
+                            {products.length === 0 ? (
                                 <div className="flex flex-col items-center justify-center py-12">
                                     <div className="text-center">
                                         <h3 className="text-lg font-semibold mb-2">No products found</h3>
@@ -300,7 +293,7 @@ export default function TotesPage() {
                                 </div>
                             ) : (
                                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                                    {filteredProducts.map((product) => (
+                                    {products.map((product) => (
                                         <ProductCard key={product.id} product={product} />
                                     ))}
                                 </div>
