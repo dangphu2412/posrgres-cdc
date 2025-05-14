@@ -33,6 +33,21 @@ export type CreateToteInput = {
   name: Scalars['String']['input'];
 };
 
+export type GetTotesInput = {
+  availability?: InputMaybe<Scalars['String']['input']>;
+  colors?: InputMaybe<Array<Scalars['String']['input']>>;
+  materials?: InputMaybe<Array<Scalars['String']['input']>>;
+  maxPrice?: InputMaybe<Scalars['Int']['input']>;
+  minPrice?: InputMaybe<Scalars['Int']['input']>;
+  minRating?: InputMaybe<Scalars['Float']['input']>;
+  page: Scalars['Int']['input'];
+  searchQuery?: InputMaybe<Scalars['String']['input']>;
+  size: Scalars['Int']['input'];
+  sizes?: InputMaybe<Array<Scalars['String']['input']>>;
+  styles?: InputMaybe<Array<Scalars['String']['input']>>;
+  tags?: InputMaybe<Array<Scalars['String']['input']>>;
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
   createTote: Scalars['ID']['output'];
@@ -63,8 +78,7 @@ export type QueryToteArgs = {
 };
 
 export type QueryTotesArgs = {
-  page: Scalars['Float']['input'];
-  size: Scalars['Float']['input'];
+  getTotesInput: GetTotesInput;
 };
 
 export type Tote = {

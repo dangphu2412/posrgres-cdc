@@ -1,11 +1,10 @@
-import type * as Types from '../../../shared/graphql/models';
+import type * as Types from '../../shared/graphql/models';
 
 import { gql } from '@apollo/client';
 import * as Apollo from '@apollo/client';
 const defaultOptions = {} as const;
 export type SearchTotesDashboardQueryVariables = Types.Exact<{
-  page: Types.Scalars['Float']['input'];
-  size: Types.Scalars['Float']['input'];
+  getTotesInput: Types.GetTotesInput;
 }>;
 
 export type SearchTotesDashboardQuery = {
@@ -53,8 +52,8 @@ export type GetQuickViewToteQuery = {
 };
 
 export const SearchTotesDashboardDocument = gql`
-  query SearchTotesDashboard($page: Float!, $size: Float!) {
-    totes(page: $page, size: $size) {
+  query SearchTotesDashboard($getTotesInput: GetTotesInput!) {
+    totes(getTotesInput: $getTotesInput) {
       id
       name
       color
@@ -84,8 +83,7 @@ export const SearchTotesDashboardDocument = gql`
  * @example
  * const { data, loading, error } = useSearchTotesDashboardQuery({
  *   variables: {
- *      page: // value for 'page'
- *      size: // value for 'size'
+ *      getTotesInput: // value for 'getTotesInput'
  *   },
  * });
  */

@@ -12,6 +12,21 @@ A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `dat
 """
 scalar DateTime
 
+input GetTotesInput {
+  availability: String
+  colors: [String!]
+  materials: [String!]
+  maxPrice: Int
+  minPrice: Int
+  minRating: Float
+  page: Int!
+  searchQuery: String
+  size: Int!
+  sizes: [String!]
+  styles: [String!]
+  tags: [String!]
+}
+
 type Mutation {
   createTote(createToteInput: CreateToteInput!): ID!
   removeTote(id: Int!): Tote!
@@ -20,7 +35,7 @@ type Mutation {
 
 type Query {
   tote(id: String!): Tote!
-  totes(page: Float!, size: Float!): [Tote!]!
+  totes(getTotesInput: GetTotesInput!): [Tote!]!
 }
 
 type Tote {

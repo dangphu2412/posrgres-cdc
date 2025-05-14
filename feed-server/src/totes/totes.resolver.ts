@@ -4,6 +4,7 @@ import { CreateToteInput } from './dto/create-tote.input';
 import { UpdateToteInput } from './dto/update-tote.input';
 import { Tote } from './tote.model';
 import { ParseIntPipe } from '@nestjs/common';
+import { GetTotesInput } from './dto/get-totes.input';
 
 @Resolver(() => Tote)
 export class TotesResolver {
@@ -15,11 +16,8 @@ export class TotesResolver {
   }
 
   @Query(() => [Tote], { name: 'totes' })
-  findAll(
-    @Args('page', ParseIntPipe) page: number = 1,
-    @Args('size', ParseIntPipe) size: number = 10,
-  ) {
-    return this.totesService.findAll(page, size);
+  findAll(@Args('getTotesInput') getTotesInput: GetTotesInput) {
+    return this.totesService.findAll(getTotesInput);
   }
 
   @Query(() => Tote, { name: 'tote' })

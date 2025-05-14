@@ -30,8 +30,10 @@ export default function TotesPage() {
 
     const { data } = useSearchTotesDashboardQuery({
         variables: {
-            page: 1,
-            size: 20
+            getTotesInput: {
+                page: 1,
+                size: 20
+            }
         }
     })
 

@@ -5,6 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
 import { ToteEntity } from './entities/tote.entity';
+import { GetTotesInput } from './dto/get-totes.input';
 
 @Injectable()
 export class TotesService {
@@ -24,25 +25,49 @@ export class TotesService {
     return identifiers[0].id as string;
   }
 
-  async findAll(page: number, size: number) {
-    const cachedTotes = await this.getCached(page, size);
+  async findAll(getTotesInput: GetTotesInput) {
+    const { page, size, materials, sizes, colors, searchQuery } = getTotesInput;
+    const cachedTotes = await this.getCached(getTotesInput);
 
     if (cachedTotes) {
       return cachedTotes;
     }
 
-    const posts = await this.toteEntityRepository.find({
-      skip: (page - 1) * size,
-      take: size,
-    });
+    const queryBuilder = this.toteEntityRepository.createQueryBuilder('totes');
 
-    await this.saveCache(page, size, posts);
+    if (materials?.length) {
+      queryBuilder.andWhere('material IN (:...materials)', {
+        materials,
+      });
+    }
+
+    if (sizes?.length) {
+      queryBuilder.andWhere('size IN (:...sizes)', {
+        sizes,
+      });
+    }
+
+    if (colors?.length) {
+      queryBuilder.andWhere('color IN (:...colors)', {
+        colors,
+      });
+    }
+
+    if (searchQuery) {
+      queryBuilder.andWhere('name LIKE :search', { search: `${searchQuery}%` });
+    }
+
+    queryBuilder.skip((page - 1) * size).take(size);
+
+    const posts = await queryBuilder.getMany();
+
+    await this.saveCache(getTotesInput, posts);
 
     return posts;
   }
 
-  private async getCached(page: number, size: number) {
-    const key = `${TotesService.CACHE_PREFIX}${page}:${size}`;
+  private async getCached(getTotesInput: GetTotesInput) {
+    const key = `${TotesService.CACHE_PREFIX}${JSON.stringify(getTotesInput)}`;
     const postIdKeys = await this.cache.get<string[]>(key);
     Logger.log(`Getting cached totes ${postIdKeys?.toString()}`);
 
@@ -81,14 +106,14 @@ export class TotesService {
 
     const merged = cached.filter((i) => i !== null).concat(missedItems);
 
-    await this.saveCache(page, size, merged);
+    await this.saveCache(getTotesInput, merged);
 
     return merged;
   }
 
-  private async saveCache(page: number, size: number, totes: ToteEntity[]) {
-    Logger.log(`Save cache posts ${page}`);
-    const key = `${TotesService.CACHE_PREFIX}${page}:${size}`;
+  private async saveCache(getTotesInput: GetTotesInput, totes: ToteEntity[]) {
+    Logger.log(`Save cache posts ${JSON.stringify(getTotesInput)}`);
+    const key = `${TotesService.CACHE_PREFIX}${JSON.stringify(getTotesInput)}`;
     const postIdKeys = totes.map((i) => `${TotesService.CACHE_PREFIX}${i.id}`);
 
     await Promise.all([

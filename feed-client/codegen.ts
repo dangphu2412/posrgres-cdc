@@ -18,7 +18,7 @@ const config: CodegenConfig = {
       preset: 'near-operation-file',
       documents: "src/features/**/*.gql",
       presetConfig: {
-        baseTypesPath: '../../shared/graphql/models.ts', // relative to the .ts file location
+        baseTypesPath: '../shared/graphql/models.ts', // relative to the .ts file location
         extension: '.graphql.ts',
         folder: '.', // put generated files alongside their .graphql
       },
