@@ -7,13 +7,13 @@ import {Badge} from "@/components/ui/badge"
 import {Button} from "@/components/ui/button"
 import {Card, CardContent, CardHeader} from "@/components/ui/card"
 import {type Product, useToteStore} from "@/features/totes/totes.store"
-import {QuickViewDialog} from "@/features/totes/quick-view-dialog";
+import {QuickViewDialog} from "@/features/totes/search-totes/quick-view-dialog";
 
 interface ProductCardProps {
     product: Product
 }
 
-export function ProductCard({ product }: ProductCardProps) {
+export function ToteOverviewCard({ product }: ProductCardProps) {
     const { addToCart } = useToteStore()
     const [quickViewOpen, setQuickViewOpen] = useState(false)
 
