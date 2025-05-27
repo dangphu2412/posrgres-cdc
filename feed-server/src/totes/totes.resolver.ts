@@ -3,7 +3,6 @@ import { TotesService } from './totes.service';
 import { CreateToteInput } from './dto/create-tote.input';
 import { UpdateToteInput } from './dto/update-tote.input';
 import { Tote } from './tote.model';
-import { ParseIntPipe } from '@nestjs/common';
 import { GetTotesInput } from './dto/get-totes.input';
 
 @Resolver(() => Tote)

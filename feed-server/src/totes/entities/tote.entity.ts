@@ -6,6 +6,13 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
+export enum Color {
+  BLACK = 'black',
+  BLUE = 'blue',
+  BROWN = 'brown',
+  RED = 'red',
+}
+
 @Entity('totes')
 export class ToteEntity {
   @PrimaryGeneratedColumn('uuid')
@@ -30,9 +37,10 @@ export class ToteEntity {
   size: string;
 
   @Column({
-    type: 'varchar',
+    type: 'enum',
+    enum: Color,
   })
-  color: string;
+  color: Color;
 
   @Column({
     type: 'float',

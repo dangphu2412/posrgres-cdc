@@ -3,8 +3,18 @@
 # ------------------------------------------------------
 
 input CreateToteInput {
+  bannerURL: String!
+  color: String!
   description: String
+  inStock: Boolean!
+  isBestSeller: Boolean!
+  isNewArrival: Boolean!
+  material: String!
   name: String!
+  price: Float!
+  rating: Float!
+  size: String!
+  style: [String!]!
 }
 
 """
@@ -57,7 +67,17 @@ type Tote {
 }
 
 input UpdateToteInput {
+  bannerURL: String
+  color: String
   description: String
   id: Int!
+  inStock: Boolean
+  isBestSeller: Boolean
+  isNewArrival: Boolean
+  material: String
   name: String
+  price: Float
+  rating: Float
+  size: String
+  style: [String!]
 }
