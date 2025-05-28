@@ -30,10 +30,10 @@ import { TotesModule } from './totes/totes.module';
         password: configService.get<string>('DB_PASSWORD'),
         database: configService.get<string>('DB_NAME'),
         entities: [ToteEntity], // Add your entities here
-        // synchronize: true -> DEVELOPMENT ONLY! Automatically creates/updates schema.
-        // WARNING: NEVER use synchronize: true in PRODUCTION. Use migrations instead.
-        synchronize: true, // For local dev, set to false in production
+        synchronize: false, // For local dev, set to false in production
         logging: true, // Set to true to see SQL queries (can be verbose)
+        migrationsRun: true,
+        migrations: [join(__dirname, 'database/migrations/*{.ts,.js}')],
       }),
     }),
     TypeOrmModule.forFeature([ToteEntity]),

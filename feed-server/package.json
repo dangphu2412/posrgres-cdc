@@ -16,7 +16,8 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "gen": "ts-node ./node_modules/typeorm/cli migration:generate ./src/database/migrations/init-table -d ./src/database/datasource.ts"
   },
   "dependencies": {
     "@apollo/server": "^4.11.3",
@@ -30,6 +31,7 @@
     "@nestjs/platform-express": "^11.0.1",
     "@nestjs/typeorm": "^11.0.0",
     "cache-manager": "^6.4.2",
+    "dotenv": "^16.5.0",
     "graphql": "^16.11.0",
     "graphql-scalars": "^1.24.2",
     "lodash": "^4.17.21",
