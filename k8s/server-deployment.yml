@@ -1,0 +1,116 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: feed-server-deployment
+  labels:
+    app: feed-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: feed-server
+  template:
+    metadata:
+      labels:
+        app: feed-server
+    spec:
+      containers:
+        - name: feed-server
+          image: chuotcona123/feed-server:latest
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "500m"
+            limits:
+              memory: "512Mi"
+              cpu: "1"
+          ports:
+            - containerPort: 3001
+          env:
+            - name: PORT
+              value: "3000"
+              # REDIS
+            - name: REDIS_URL
+              value: redis://redis:6379
+
+            - name: DB_HOST
+              value: postgres
+            - name: DB_PORT
+              value: '5432'
+            - name: DB_USER
+              value: user
+            - name: DB_PASSWORD
+              value: password
+            - name: DB_NAME
+              value: cdc_source_db
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tinyurl-service
+spec:
+  type: NodePort
+  selector:
+    app: feed-server
+  ports:
+    - protocol: TCP
+      port: 3000
+      targetPort: 3000
+      nodePort: 30101
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: node-app-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/proxy-next-upstream-tries: "3"
+spec:
+  rules:
+    - host: localhost
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: tinyurl-service
+                port:
+                  number: 3000
+
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: feed-server-autoscaler
+  labels:
+    app: feed-server
+spec:
+  maxReplicas: 4
+  minReplicas: 2
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: feed-server-deployment
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 60
+  behavior:
+    scaleDown:
+      policies:
+        - type: Pods
+          value: 2
+          periodSeconds: 60
+        - type: Percent
+          value: 40
+          periodSeconds: 60
